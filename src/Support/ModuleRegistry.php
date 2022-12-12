@@ -42,7 +42,7 @@ class ModuleRegistry
 	public function moduleForClass(string $fqcn): ?ModuleConfig
 	{
 		return $this->modules()
-			->first(fn(ModuleConfig $module) => Str::startsWith($fqcn, $module->namespaces->values()->all()));
+			->first(fn (ModuleConfig $module) => Str::startsWith($fqcn, $module->namespaces->values()->all()));
 	}
 	
 	public function modules(): Collection
@@ -60,10 +60,13 @@ class ModuleRegistry
 	
 	protected function loadModules(): Collection
 	{
-		return $this->auto_discovery_helper
-			->getModules()
-			->map(fn(array $data) => ModuleConfig::fromArray($data))
-			->toBase();
+		$modules = $this->auto_discovery_helper
+		->getModules()
+		->map(fn (array $data) => ModuleConfig::fromArray($data))
+		->toBase();
+
+		// var_dump($modules);
+		return $modules;
 	}
 	
 	protected function extractModuleNameFromPath(string $path): string

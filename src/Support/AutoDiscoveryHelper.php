@@ -26,9 +26,9 @@ class AutoDiscoveryHelper
 	{
 		// Execute all our loaders to ensure everything has been discovered
 		collect((new ReflectionClass($this))->getMethods(ReflectionMethod::IS_PUBLIC))
-			->map(fn(ReflectionMethod $method) => $method->getName())
-			->filter(fn($name) => Str::startsWith($name, 'get'))
-			->each(fn($method) => $this->{$method}());
+			->map(fn (ReflectionMethod $method) => $method->getName())
+			->filter(fn ($name) => Str::startsWith($name, 'get'))
+			->each(fn ($method) => $this->{$method}());
 		
 		return $this->discovered;
 	}
@@ -179,7 +179,7 @@ class AutoDiscoveryHelper
 	
 	protected function load(string $name, Closure $loader): Collection
 	{
-		if (!isset($this->discovered[$name])) {
+		if (! isset($this->discovered[$name])) {
 			try {
 				$this->discovered[$name] = collect($loader())->toArray();
 			} catch (DirectoryNotFoundException $exception) {

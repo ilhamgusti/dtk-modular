@@ -88,7 +88,7 @@ class ModularServiceProvider extends ServiceProvider
 		$this->registerLazily(Migrator::class, [$this, 'registerMigrations']);
 		$this->registerLazily(Gate::class, [$this, 'registerPolicies']);
 		
-		// If we're running Laravel 7 or lower, set up legacy factory support 
+		// If we're running Laravel 7 or lower, set up legacy factory support
 		if (class_exists(LegacyEloquentFactory::class)) {
 			$this->registerLazily(LegacyEloquentFactory::class, [$this, 'registerLegacyFactories']);
 		}
@@ -127,7 +127,7 @@ class ModularServiceProvider extends ServiceProvider
 	
 	protected function bootPackageCommands(): void
 	{
-		if (!$this->app->runningInConsole()) {
+		if (! $this->app->runningInConsole()) {
 			return;
 		}
 		
@@ -148,7 +148,7 @@ class ModularServiceProvider extends ServiceProvider
 		
 		$this->autoDiscoveryHelper()
 			->getRoutes()
-			->each(fn($pathname) => require $pathname);
+			->each(fn ($pathname) => require $pathname);
 	}
 	
 	protected function bootViews(): void
@@ -181,7 +181,7 @@ class ModularServiceProvider extends ServiceProvider
 		$this->callAfterResolving('translator', function(TranslatorContract $translator) {
 			// These methods aren't on the contract so we'll confirm that they exist on the
 			// implementation before proceeding (if the app has a custom translator)
-			if (!method_exists($translator, 'addNamespace') || !method_exists($translator, 'addJsonPath')) {
+			if (! method_exists($translator, 'addNamespace') || ! method_exists($translator, 'addJsonPath')) {
 				return;
 			}
 			
@@ -203,7 +203,7 @@ class ModularServiceProvider extends ServiceProvider
 	{
 		$class_name = 'Diglactic\\Breadcrumbs\\Manager';
 		
-		if (!class_exists($class_name)) {
+		if (! class_exists($class_name)) {
 			return;
 		}
 		
@@ -220,7 +220,7 @@ class ModularServiceProvider extends ServiceProvider
 
 	protected function bootLivewireComponents(): void
 	{
-		if (!class_exists(Livewire::class)) {
+		if (! class_exists(Livewire::class)) {
 			return;
 		}
 		
@@ -380,6 +380,6 @@ class ModularServiceProvider extends ServiceProvider
 	protected function isInstantiableCommand($command): bool
 	{
 		return is_subclass_of($command, Command::class)
-			&& !(new ReflectionClass($command))->isAbstract();
+			&& ! (new ReflectionClass($command))->isAbstract();
 	}
 }

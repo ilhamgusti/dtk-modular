@@ -17,6 +17,8 @@ class ModuleRegistryTest extends TestCase
 		
 		$registry = $this->app->make(ModuleRegistry::class);
 		
+		$registry->modules();
+		
 		$this->assertInstanceOf(ModuleConfig::class, $registry->module('test-module'));
 		$this->assertInstanceOf(ModuleConfig::class, $registry->module('test-module-two'));
 		$this->assertNull($registry->module('non-existant-module'));

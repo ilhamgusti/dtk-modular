@@ -7,10 +7,7 @@ use InterNACHI\Modular\Console\Commands\Make\MakeCommand;
 use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
 use InterNACHI\Modular\Console\Commands\Make\MakeLivewire;
 use InterNACHI\Modular\Console\Commands\Make\MakeModel;
-use InterNACHI\Modular\Support\AutoCacheDiscoveryHelper;
 use InterNACHI\Modular\Support\AutoDiscoveryHelper;
-use InterNACHI\Modular\Support\Cache;
-use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use Livewire\LivewireServiceProvider;
 

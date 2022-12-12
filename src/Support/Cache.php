@@ -45,7 +45,7 @@ class Cache
 	{
 		$this->cache = [];
 		
-		if (!file_exists($this->filename)) {
+		if (! file_exists($this->filename)) {
 			return true;
 		}
 		
@@ -54,14 +54,14 @@ class Cache
 	
 	public function load(): bool
 	{
-		if (!is_readable($this->filename)) {
+		if (! is_readable($this->filename)) {
 			return true;
 		}
 		
 		try {
 			$this->cache = include $this->filename;
 			
-			if (!is_array($this->cache)) {
+			if (! is_array($this->cache)) {
 				throw new RuntimeException('Module cache is not a valid array of data.');
 			}
 			
@@ -83,7 +83,7 @@ class Cache
 	protected function migrate(): void
 	{
 		// Migrate from version-less array to v1
-		if (!isset($this->cache[static::VERSION_KEY])) {
+		if (! isset($this->cache[static::VERSION_KEY])) {
 			$this->cache = [
 				static::VERSION_KEY => 1,
 				'modules' => $this->cache,

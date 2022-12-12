@@ -18,7 +18,7 @@ class ModulesCache extends Command
 		
 		$cache->write($helper->toArray());
 		
-		if (!$cache->load()) {
+		if (! $cache->load()) {
 			$this->error('Unable to cache module configuration.');
 			return 1;
 		}

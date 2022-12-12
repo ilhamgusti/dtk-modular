@@ -41,7 +41,7 @@ class FinderCollection implements IteratorAggregate
 	{
 		// Forward the call either to the Finder or the LazyCollection depending
 		// on the method (always giving precedence to the Finder class unless otherwise configured)
-		if (!in_array($name, static::$prefer_collection_methods) && is_callable([$this->finder, $name])) {
+		if (! in_array($name, static::$prefer_collection_methods) && is_callable([$this->finder, $name])) {
 			$result = $this->forwardCallTo($this->finder, $name, $arguments);
 		} else {
 			$this->collection->source = $this->finder;
