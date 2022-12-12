@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         dependency-version: [ stable, lowest ]
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest ]
         laravel: [ ^8.79, ^9.0 ]
         php: [ 8.0, 8.1 ]
         exclude:
