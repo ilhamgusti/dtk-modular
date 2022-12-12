@@ -3,8 +3,6 @@ name: PHPUnit
 on:
   push:
   pull_request:
-  schedule:
-    - cron: '0 14 * * 3' # Run Wednesdays at 2pm EST
 
 jobs:
   php-tests:
@@ -13,7 +11,7 @@ jobs:
         dependency-version: [ stable, lowest ]
         os: [ ubuntu-latest, windows-latest ]
         laravel: [ ^8.79, ^9.0 ]
-        php: [ 7.4, 8.0, 8.1 ]
+        php: [ 8.0, 8.1 ]
         exclude:
           - php: 7.4
             laravel: ^9.0
