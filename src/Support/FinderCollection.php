@@ -6,6 +6,7 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use IteratorAggregate;
 use Symfony\Component\Finder\Finder;
+use Traversable;
 
 /**
  * @mixin \Illuminate\Support\LazyCollection
@@ -17,7 +18,7 @@ class FinderCollection implements IteratorAggregate
 	
 	protected static array $prefer_collection_methods = ['filter', 'each'];
 	
-	protected Finder $finder;
+	protected Finder|Traversable $finder;
 	
 	protected LazyCollection $collection;
 	
@@ -64,7 +65,7 @@ class FinderCollection implements IteratorAggregate
 		return $result;
 	}
 	
-	public function getIterator()
+	public function getIterator(): Traversable
 	{
 		return $this->collection->getIterator();
 	}
