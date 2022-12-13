@@ -86,7 +86,7 @@ class Cache
 		if (! isset($this->cache[static::VERSION_KEY])) {
 			$this->cache = [
 				static::VERSION_KEY => 1,
-				'modules' => $this->cache,
+				...$this->cache,
 			];
 		}
 	}
