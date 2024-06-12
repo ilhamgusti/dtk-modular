@@ -8,10 +8,8 @@ use InterNACHI\Modular\Console\Commands\Make\MakeComponent;
 use InterNACHI\Modular\Console\Commands\Make\MakeLivewire;
 use InterNACHI\Modular\Console\Commands\Make\MakeModel;
 use InterNACHI\Modular\Support\AutoDiscoveryHelper;
-use InterNACHI\Modular\Support\ModuleRegistry;
 use InterNACHI\Modular\Tests\Concerns\WritesToAppFilesystem;
 use Livewire\LivewireServiceProvider;
-use Symfony\Component\Finder\SplFileInfo;
 
 class AutoDiscoveryHelperTest extends TestCase
 {
@@ -29,10 +27,17 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$this->module1 = $this->makeModule('test-module');
 		$this->module2 = $this->makeModule('test-module-two');
-		$this->helper = new AutoDiscoveryHelper(
-			new ModuleRegistry($this->getBasePath().'/app-modules', ''),
-			new Filesystem()
-		);
+		$this->helper = new AutoDiscoveryHelper($this->getBasePath().'/app-modules', []);
+	}
+	
+	protected function tearDown(): void
+	{
+		$cache_path = $this->getBasePath().'/bootstrap/cache/modules.php';
+		if ($this->filesystem()->exists($cache_path)) {
+			$this->filesystem()->delete($cache_path);
+		}
+		
+		parent::tearDown();
 	}
 	
 	public function test_it_finds_commands(): void
@@ -49,8 +54,8 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$resolved = [];
 		
-		$this->helper->commandFileFinder()->each(function(SplFileInfo $command) use (&$resolved) {
-			$resolved[] = str_replace('\\', '/', $command->getPathname());
+		$this->helper->getCommands()->each(function($pathname) use (&$resolved) {
+			$resolved[] = $pathname;
 		});
 		
 		$this->assertContains($this->module1->path('src/Console/Commands/TestCommand.php'), $resolved);
@@ -61,8 +66,8 @@ class AutoDiscoveryHelperTest extends TestCase
 	{
 		$resolved = [];
 		
-		$this->helper->factoryDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = str_replace('\\', '/', $directory->getPathname());
+		$this->helper->getLegacyFactories()->each(function($pathname) use (&$resolved) {
+			$resolved[] = $pathname;
 		});
 		
 		$this->assertContains($this->module1->path('database/factories'), $resolved);
@@ -73,8 +78,8 @@ class AutoDiscoveryHelperTest extends TestCase
 	{
 		$resolved = [];
 		
-		$this->helper->migrationDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = str_replace('\\', '/', $directory->getPathname());
+		$this->helper->getMigrations()->each(function($pathname) use (&$resolved) {
+			$resolved[] = $pathname;
 		});
 		
 		$this->assertContains($this->module1->path('database/migrations'), $resolved);
@@ -95,8 +100,8 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$resolved = [];
 		
-		$this->helper->modelFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = str_replace('\\', '/', $file->getPathname());
+		$this->helper->getModels()->each(function($pathname) use (&$resolved) {
+			$resolved[] = $pathname;
 		});
 		
 		$this->assertContains($this->module1->path('src/Models/TestModel.php'), $resolved);
@@ -115,30 +120,22 @@ class AutoDiscoveryHelperTest extends TestCase
 			'--module' => $this->module2->name,
 		]);
 		
-		$resolved_directories = [];
-		$resolved_files = [];
+		$resolved = [];
 		
-		$this->helper->bladeComponentDirectoryFinder()->each(function(SplFileInfo $file) use (&$resolved_directories) {
-			$resolved_directories[] = str_replace('\\', '/', $file->getPathname());
+		$this->helper->getBladeComponents()->each(function($pathname) use (&$resolved) {
+			$resolved[] = $pathname;
 		});
 		
-		$this->helper->bladeComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved_files) {
-			$resolved_files[] = str_replace('\\', '/', $file->getPathname());
-		});
-		
-		$this->assertContains($this->module1->path('src/View/Components'), $resolved_directories);
-		$this->assertContains($this->module2->path('src/View/Components'), $resolved_directories);
-		
-		$this->assertContains($this->module1->path('src/View/Components/TestComponent.php'), $resolved_files);
-		$this->assertContains($this->module2->path('src/View/Components/TestComponent.php'), $resolved_files);
+		$this->assertContains($this->module1->path('src/View/Components/TestComponent.php'), $resolved);
+		$this->assertContains($this->module2->path('src/View/Components/TestComponent.php'), $resolved);
 	}
 	
 	public function test_it_finds_routes(): void
 	{
 		$resolved = [];
 		
-		$this->helper->routeFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = str_replace('\\', '/', $file->getPathname());
+		$this->helper->getRoutes()->each(function($pathname) use (&$resolved) {
+			$resolved[] = $pathname;
 		});
 		
 		$this->assertContains($this->module1->path("routes/{$this->module1->name}-routes.php"), $resolved);
@@ -149,8 +146,8 @@ class AutoDiscoveryHelperTest extends TestCase
 	{
 		$resolved = [];
 		
-		$this->helper->viewDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = str_replace('\\', '/', $directory->getPathname());
+		$this->helper->getViewDirectories()->each(function($pathname) use (&$resolved) {
+			$resolved[] = $pathname;
 		});
 		
 		$this->assertContains($this->module1->path('resources/views'), $resolved);
@@ -166,8 +163,8 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$resolved = [];
 		
-		$this->helper->langDirectoryFinder()->each(function(SplFileInfo $directory) use (&$resolved) {
-			$resolved[] = str_replace('\\', '/', $directory->getPathname());
+		$this->helper->getLangDirectories()->each(function($pathname) use (&$resolved) {
+			$resolved[] = $pathname;
 		});
 		
 		$this->assertContains($this->module1->path('resources/lang'), $resolved);
@@ -188,8 +185,8 @@ class AutoDiscoveryHelperTest extends TestCase
 		
 		$resolved = [];
 		
-		$this->helper->livewireComponentFileFinder()->each(function(SplFileInfo $file) use (&$resolved) {
-			$resolved[] = str_replace('\\', '/', $file->getPathname());
+		$this->helper->getLivewireComponentFiles()->each(function(array $component) use (&$resolved) {
+			$resolved[] = $component[0];
 		});
 		
 		$this->assertContains($this->module1->path('src/Http/Livewire/TestComponent.php'), $resolved);

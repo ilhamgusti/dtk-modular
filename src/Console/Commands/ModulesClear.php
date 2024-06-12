@@ -3,8 +3,8 @@
 namespace InterNACHI\Modular\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
-use InterNACHI\Modular\Support\ModuleRegistry;
+use InterNACHI\Modular\Support\AutoDiscoveryHelper;
+use InterNACHI\Modular\Support\Cache;
 
 class ModulesClear extends Command
 {
@@ -12,9 +12,13 @@ class ModulesClear extends Command
 	
 	protected $description = 'Remove the module cache file';
 	
-	public function handle(Filesystem $filesystem, ModuleRegistry $registry)
+	public function handle(AutoDiscoveryHelper $helper, Cache $cache)
 	{
-		$filesystem->delete($registry->getCachePath());
-		$this->info('Module cache cleared!');
+		if ($cache->delete() && $helper->clear()) {
+			$this->info('Module cache cleared!');
+		} else {
+			$this->error('Unable to clear cache!');
+			return 1;
+		}
 	}
 }

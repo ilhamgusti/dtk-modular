@@ -15,71 +15,56 @@ use Symfony\Component\Console\Terminal;
 
 class MakeModule extends Command
 {
-	protected $signature = 'make:module
-		{name : The name of the module}
+	protected $signature = 'make:module 
+		{name : The name of the module} 
 		{--accept-default-namespace : Skip default namespace confirmation}';
 	
 	protected $description = 'Create a new Laravel module';
 	
 	/**
 	 * This is the base path of the module
-	 *
-	 * @var string
 	 */
-	protected $base_path;
+	protected string $base_path;
 	
 	/**
 	 * This is the PHP namespace for all modules
-	 *
-	 * @var string
 	 */
-	protected $module_namespace;
+	protected string $module_namespace;
 	
 	/**
 	 * This is the composer namespace for all modules
-	 *
-	 * @var string
 	 */
-	protected $composer_namespace;
+	protected string $composer_namespace;
 	
 	/**
 	 * This is the name of the module
-	 *
-	 * @var string
 	 */
-	protected $module_name;
+	protected string $module_name;
 	
 	/**
 	 * This is the module name as a StudlyCase'd name
-	 *
-	 * @var string
 	 */
-	protected $class_name_prefix;
+	protected string $class_name_prefix;
 	
 	/**
 	 * This is the name of the module as a composer package
 	 * i.e. modules/my-module
-	 *
-	 * @var string
 	 */
-	protected $composer_name;
+	protected string $composer_name;
 	
-	/**
-	 * @var \Illuminate\Filesystem\Filesystem
-	 */
-	protected $filesystem;
+	protected string $modules_path;
 	
-	/**
-	 * @var \InterNACHI\Modular\Support\ModuleRegistry
-	 */
-	protected $module_registry;
+	protected Filesystem $filesystem;
 	
-	public function __construct(Filesystem $filesystem, ModuleRegistry $module_registry)
+	protected ModuleRegistry $module_registry;
+	
+	public function __construct(Filesystem $filesystem, ModuleRegistry $module_registry, string $modules_path)
 	{
 		parent::__construct();
 		
 		$this->filesystem = $filesystem;
 		$this->module_registry = $module_registry;
+		$this->modules_path = $modules_path;
 	}
 	
 	public function handle()
@@ -89,7 +74,7 @@ class MakeModule extends Command
 		$this->module_namespace = config('app-modules.modules_namespace', 'Modules');
 		$this->composer_namespace = config('app-modules.modules_vendor') ?? Str::kebab($this->module_namespace);
 		$this->composer_name = "{$this->composer_namespace}/{$this->module_name}";
-		$this->base_path = $this->module_registry->getModulesPath().'/'.$this->module_name;
+		$this->base_path = $this->modules_path.DIRECTORY_SEPARATOR.$this->module_name;
 		
 		$this->setUpStyles();
 		
@@ -110,7 +95,7 @@ class MakeModule extends Command
 		$this->line("Please run <kbd>composer update {$this->composer_name}</kbd>");
 		$this->newLine();
 		
-		$this->module_registry->reload();
+		$this->module_registry->clear();
 		
 		return 0;
 	}
@@ -151,7 +136,7 @@ class MakeModule extends Command
 			$this->line(" - Created <info>{$this->base_path}</info>");
 		}
 	}
-	
+
 	protected function writeStubs()
 	{
 		$this->title('Creating initial module files');
@@ -189,7 +174,7 @@ class MakeModule extends Command
 			
 			$this->filesystem->ensureDirectoryExists($this->filesystem->dirname($filename));
 			$this->filesystem->put($filename, $output);
-			
+
 			$this->line(" - Wrote to <info>{$destination}</info>");
 		}
 		
